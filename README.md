@@ -2,7 +2,7 @@ This repository is the output of the tutorial that could be found on https://ang
 
 The notes below were gathered with the intention of summarizing the concepts mentioned in the tutorial for future refence and the they are completely taken from https://angular.io/tutorial/ tutorial series and official Angular documentation found in https://angular.io/. Also some other resources are referenced, with a reference link.
 
-# TourOfheroes
+# Tour of heroes
 
 By the end of this tutorial you will be able to do the following:
 
@@ -206,7 +206,7 @@ Don't forget the asterisk (*) in front of ngIf. It's a critical part of the synt
 
 __class binding__: 
 
-It's difficult to identify the selected hero in the list when all <li> elements look alike.
+It's difficult to identify the selected hero in the list when all \<li> elements look alike.
 
 If the user clicks "Magneta", that hero should render with a distinctive but subtle background color like this:
 
@@ -218,7 +218,7 @@ That selected hero coloring is the work of the .selected CSS class in the styles
 
 <mark>The Angular class binding makes it easy to add and remove a CSS class conditionally. Just add [class.some-css-class]="some-condition" to the element you want to style.</mark>
 
-Add the following [class.selected] binding to the <li> in the HeroesComponent template:
+Add the following [class.selected] binding to the \<li> in the HeroesComponent template:
 
 _[class.selected]="hero === selectedHero"_
 
