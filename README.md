@@ -63,9 +63,9 @@ Angular offers a special two-way data binding syntax for this purpose, [()]. The
 
 [(ngModel)] is Angular's two-way data binding syntax.
 
-<div><mark>Although _ngModel_ is a valid Angular directive, it isn't available by default.</mark></div>
+> Although _ngModel_ is a valid Angular directive, it isn't available by default.
 
-<div><mark>It belongs to the optional FormsModule and you must opt-in to using it.</mark></div>
+> It belongs to the optional FormsModule and you must opt-in to using it.
 
 The following explanation for two-way binding is taken from <a  href="https://blog.thoughtram.io/angular/2016/10/13/two-way-data-binding-in-angular-2.html" target="_blank">here</a>.
 
@@ -155,7 +155,7 @@ The syntax in this example is as follows:
 * heroes holds the mock heroes list from the HeroesComponent class, the mock heroes list.
 * hero holds the current hero object for each iteration through the list.
 
-<div><mark>Don't forget the asterisk (*) in front of ngFor. It's a critical part of the syntax.</mark></div>
+> Don't forget the asterisk (*) in front of ngFor. It's a critical part of the syntax.
 
 ``` html
 <li *ngFor="let hero of heroes">
@@ -167,9 +167,9 @@ In the first tutorial, you set the basic styles for the entire application in st
 
 You could add more styles to styles.css and keep growing that stylesheet as you add components.
 
-<div><mark>You may prefer instead to define private styles for a specific component and keep everything a component needs— the code, the HTML, and the CSS —together in one place.
+> You may prefer instead to define private styles for a specific component and keep everything a component needs— the code, the HTML, and the CSS —together in one place.
 
-This approach makes it easier to re-use the component somewhere else and deliver the component's intended appearance even if the global styles are different.</mark></div>
+This approach makes it easier to re-use the component somewhere else and deliver the component's intended appearance even if the global styles are different.
 
 You define private styles either inline in the @Component.styles array or as stylesheet file(s) identified in the @Component.styleUrls array.
 
@@ -177,7 +177,7 @@ When the CLI generated the HeroesComponent, it created an empty heroes.component
 
 Open the heroes.component.css file and paste in the private CSS styles for the HeroesComponent. You'll find them in the final code review at the bottom of this guide.
 
-<div><mark>Styles and stylesheets identified in @Component metadata are scoped to that specific component. The heroes.component.css styles apply only to the HeroesComponent and don't affect the outer HTML or the HTML in any other component.</mark></div>
+> Styles and stylesheets identified in @Component metadata are scoped to that specific component. The heroes.component.css styles apply only to the HeroesComponent and don't affect the outer HTML or the HTML in any other component.
 
 __event binding__: Event binding allows you to listen for certain events such as keystrokes, mouse movements, clicks, and touches.
 
@@ -216,7 +216,7 @@ If the user clicks "Magneta", that hero should render with a distinctive but sub
 
 That selected hero coloring is the work of the .selected CSS class in the styles you added earlier. You just have to apply the .selected class to the \<li> when the user clicks it.
 
-<div><mark>The Angular class binding makes it easy to add and remove a CSS class conditionally. Just add [class.some-css-class]="some-condition" to the element you want to style.</mark></div>
+> The Angular class binding makes it easy to add and remove a CSS class conditionally. Just add [class.some-css-class]="some-condition" to the element you want to style.
 
 Add the following [class.selected] binding to the \<li> in the HeroesComponent template:
 
@@ -250,7 +250,7 @@ After the refactoring in this tutorial, HeroesComponent will be lean and focused
 
 __Why services__
 
-<div><mark>Components shouldn't fetch or save data directly and they certainly shouldn't knowingly present fake data. They should focus on presenting data and delegate data access to a service.</mark></div>
+> Components shouldn't fetch or save data directly and they certainly shouldn't knowingly present fake data. They should focus on presenting data and delegate data access to a service.
 
 In this tutorial, you'll create a HeroService that all application classes can use to get heroes. Instead of creating that service with new, you'll rely on Angular dependency injection to inject it into the HeroesComponent constructor.
 
