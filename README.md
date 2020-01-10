@@ -571,3 +571,254 @@ The browser refreshes and the page displays the list of heroes. Scroll to the bo
 * The component's ngOnInit lifecycle hook calls the HeroService method, not the constructor.
 * You created a MessageService for loosely-coupled communication between classes.
 * The HeroService injected into a component is created with another injected service, MessageService.
+
+
+## Part V (Routing)
+(! This part consists of important key concepts to grasp about routing : see
+https://angular.io/tutorial/toh-pt5)
+
+In Angular, the best practice is to load and configure the router in a separate, top-level module that is dedicated to routing and imported by the root AppModule.
+
+By convention, the module class name is AppRoutingModule and it belongs in the app-routing.module.ts in the src/app folder.
+
+__ng generate module app-routing --flat --module=app__: Angular CLI command to generate our routing module at the application level.
+
+> --flat puts the file in src/app instead of its own folder.
+> --module=app tells the CLI to register it in the imports array of the AppModule.
+
+_src/app/app-routing.module.ts (updated)_
+
+``` typescript
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { HeroesComponent } from './heroes/heroes.component';
+
+const routes: Routes = [
+  { path: 'heroes', component: HeroesComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+First, AppRoutingModule imports RouterModule and Routes so the app can have routing functionality. The next import, HeroesComponent, will give the Router somewhere to go once you configure the routes.
+
+Notice that the CommonModule references and declarations array are unnecessary, so are no longer part of AppRoutingModule. The following sections explain the rest of the AppRoutingModule in more detail.
+
+__routes__:
+
+A typical Angular Route has two properties:
+
+* path: a string that matches the URL in the browser address bar.
+* component: the component that the router should create when navigating to this route.
+
+This tells the router to match that URL to path: 'heroes' and display the HeroesComponent when the URL is something like localhost:4200/heroes.
+
+__RouterModule.forRoot()__:
+
+The @NgModule metadata initializes the router and starts it listening for browser location changes.
+
+The following line adds the RouterModule to the AppRoutingModule imports array and configures it with the routes in one step by calling RouterModule.forRoot():
+
+_src/app/app-routing.module.ts_
+``` typescript
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+```
+> The method is called forRoot() because you configure the router at the application's root level. The forRoot() method supplies the service providers and directives needed for routing, and performs the initial navigation based on the current browser URL.
+
+Next, AppRoutingModule exports RouterModule so it will be available throughout the app.
+
+__Add RouterOutlet__:
+
+Open the AppComponent template and replace the \<app-heroes> element with a \<router-outlet> element.
+
+_src/app/app.component.html (router-outlet)_
+``` html
+<h1>{{title}}</h1>
+<router-outlet></router-outlet>
+<app-messages></app-messages>
+```
+The \<router-outlet> tells the router where to display routed views.
+
+> The RouterOutlet is one of the router directives that became available to the AppComponent because AppModule imports AppRoutingModule which exported RouterModule.
+
+
+__routerLink__:
+
+A routerLink attribute is set to "/heroes", the string that the router matches to the route to HeroesComponent. The routerLink is the selector for the RouterLink directive that turns user clicks into router navigations. It's another of the public directives in the RouterModule.
+
+The browser refreshes and displays the app title and heroes link, but not the heroes list.
+
+Click the link. The address bar updates to /heroes and the list of heroes appears.
+
+__ng generate component dashboard__:
+
+Angular CLI command for adding DashboardComponent.
+
+__default route__:
+
+When the app starts, the browser's address bar points to the web site's root. That doesn't match any existing route so the router doesn't navigate anywhere. The space below the <router-outlet> is blank.
+
+To make the app navigate to the dashboard automatically, add the following route to the AppRoutingModule.Routes array.
+
+_src/app/app-routing.module.ts_
+``` typescript
+{ path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+```
+This route redirects a URL that fully matches the empty path to the route whose path is '/dashboard'.
+
+After the browser refreshes, the router loads the DashboardComponent and the browser address bar shows the /dashboard URL.
+
+__hero details__:
+
+The HeroDetailsComponent displays details of a selected hero. At the moment the HeroDetailsComponent is only visible at the bottom of the HeroesComponent
+
+The user should be able to get to these details in three ways.
+
+* By clicking a hero in the dashboard.
+* By clicking a hero in the heroes list.
+* By pasting a "deep link" URL into the browser address bar that identifies the hero to display.
+
+In this section, you'll enable navigation to the HeroDetailsComponent and liberate it from the HeroesComponent.
+
+__routing with parameter__:
+
+_src/app/app-routing.module.ts_
+``` typescript
+{ path: 'detail/:id', component: HeroDetailComponent },
+```
+The colon (:) in the path indicates that :id is a placeholder for a specific hero id.
+
+
+__interpolation binding {{ }}__:
+
+``` html
+<a *ngFor="let hero of heroes" class="col-1-4"
+    routerLink="/detail/{{hero.id}}">
+  <div class="module hero">
+    <h4>{{hero.name}}</h4>
+  </div>
+</a>
+```
+
+__routable HeroDetailComponent__:
+
+Previously, the parent HeroesComponent set the HeroDetailComponent.hero property and the HeroDetailComponent displayed the hero.
+
+HeroesComponent doesn't do that anymore. Now the router creates the HeroDetailComponent in response to a URL such as ~/detail/11.
+
+The HeroDetailComponent needs a new way to obtain the hero-to-display. This section explains the following:
+
+* __Get the route that created it__
+* Extract the id from the route
+* Acquire the hero with that id from the server via the HeroService
+
+Add the following imports:
+
+_src/app/hero-detail/hero-detail.component.ts_
+``` typescript
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
+
+import { HeroService }  from '../hero.service';
+```
+
+Inject the ActivatedRoute, HeroService, and Location services into the constructor, saving their values in private fields:
+
+_src/app/hero-detail/hero-detail.component.ts_
+``` typescript
+constructor(
+  private route: ActivatedRoute,
+  private heroService: HeroService,
+  private location: Location
+) {}
+```
+
+__The ActivatedRoute holds information about the route to this instance of the HeroDetailComponent. This component is interested in the route's parameters extracted from the URL. The "id" parameter is the id of the hero to display.__
+
+The HeroService gets hero data from the remote server and this component will use it to get the hero-to-display.
+
+The location is an Angular service for interacting with the browser. You'll use it later to navigate back to the view that navigated here.
+
+__Extract the id route parameter__:
+
+In the ngOnInit() lifecycle hook call getHero() and define it as follows.
+
+
+_src/app/hero-detail/hero-detail.component.ts_
+``` typescript
+ngOnInit(): void {
+  this.getHero();
+}
+
+getHero(): void {
+  const id = +this.route.snapshot.paramMap.get('id');
+  this.heroService.getHero(id)
+    .subscribe(hero => this.hero = hero);
+}
+```
+
+The __route.snapshot__ is a static image of the route information shortly after the component was created.
+
+The paramMap is a dictionary of route parameter values extracted from the URL. The "id" key returns the id of the hero to fetch.
+
+Route parameters are always strings. The JavaScript (+) operator converts the string to a number, which is what a hero id should be.
+
+The browser refreshes and the app crashes with a compiler error. HeroService doesn't have a getHero() method. Add it now.
+
+__Add HeroService.getHero()__:
+
+Open HeroService and add the following getHero() method with the id after the getHeroes() method:
+
+_src/app/hero.service.ts (getHero)_
+``` typescript
+getHero(id: number): Observable<Hero> {
+  // TODO: send the message _after_ fetching the hero
+  this.messageService.add(`HeroService: fetched hero id=${id}`);
+  return of(HEROES.find(hero => hero.id === id));
+}
+```
+> Note the backticks ( ` ) that define a JavaScript template literal for embedding the id.
+
+Like getHeroes(), getHero() has an asynchronous signature. It returns a mock hero as an Observable, using the RxJS of() function.
+
+You'll be able to re-implement getHero() as a real Http request without having to change the HeroDetailComponent that calls it.
+
+__finding the way back__
+
+By clicking the browser's back button, you can go back to the hero list or dashboard view, depending upon which sent you to the detail view.
+
+It would be nice to have a button on the HeroDetail view that can do that.
+
+Add a go back button to the bottom of the component template and bind it to the component's goBack() method.
+
+_src/app/hero-detail/hero-detail.component.html (back button)_
+``` html
+<button (click)="goBack()">go back</button>
+```
+
+_src/app/hero-detail/hero-detail.component.ts (goBack)_
+``` typescript
+goBack(): void {
+  this.location.back();
+}
+```
+
+Users can navigate around the app, from the dashboard to hero details and back, from heroes list to the mini detail to the hero details and back to the heroes again.
+
+### Part V Summary
+* You added the Angular router to navigate among different components.
+* You turned the AppComponent into a navigation shell with <a> links and a <router-outlet>.
+* You configured the router in an AppRoutingModule
+* You defined simple routes, a redirect route, and a parameterized route.
+* You used the routerLink directive in anchor elements.
+* You refactored a tightly-coupled master/detail view into a routed detail view.
+* You used router link parameters to navigate to the detail view of a user-selected hero.
+* You shared the HeroService among multiple components.
+
